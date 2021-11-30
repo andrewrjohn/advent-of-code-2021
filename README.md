@@ -32,4 +32,6 @@ Run the program (first time will take a little longer to download dependencies)
   cargo run
 ```
 
+---
+
 Readme created with [Readme.so](https://readme.so)
