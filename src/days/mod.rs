@@ -1,4 +1,5 @@
-mod day_1;
-mod day_2;
-pub use day_1::main as one;
-pub use day_2::main as two;
+mod day01;
+mod day02;
+mod input_helper;
+pub use day01::main as one;
+pub use day02::main as two;
