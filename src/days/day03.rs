@@ -5,7 +5,7 @@ enum Commonality {
     Least,
 }
 
-fn part2() -> i32 {
+fn part_2() -> i32 {
     let input = input_helper::get_input(3);
 
     fn most_or_least_common(index: usize, vals: &Vec<String>, commonality: Commonality) -> i32 {
@@ -59,13 +59,13 @@ fn part2() -> i32 {
 }
 
 pub fn main() {
-    part2();
+    part_2();
 }
 
 #[cfg(test)]
 mod tests {
     #[test]
     fn part_2() {
-        assert_eq!(super::part2(), 587895)
+        assert_eq!(super::part_2(), 587895)
     }
 }
