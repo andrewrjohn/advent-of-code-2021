@@ -1,0 +1,58 @@
+use std::cmp::*;
+
+use crate::days::input_helper;
+
+struct Cost {
+    fuel: i32,
+    position: i32,
+}
+
+fn part1() {
+    let input: Vec<i32> = input_helper::get_input(7)
+        .first()
+        .unwrap()
+        .split(",")
+        .map(|n| n.parse::<i32>().unwrap())
+        .collect();
+
+    // let example: Vec<i32> = "16,1,2,0,4,2,7,1,2,14" .split(",")
+    //     .map(|n| n.parse::<i32>().unwrap())
+    //     .collect();
+
+    let max_pos = input.iter().max().unwrap();
+
+    let mut fuel_costs = Vec::new();
+
+    for possible_pos in 0..max_pos.to_owned() {
+        let mut fuel_cost = 0;
+
+        for pos in &input {
+            let cost = pos - possible_pos;
+
+            // println!("{:?}", cost.abs());
+            fuel_cost += cost.abs();
+        }
+
+        fuel_costs.push(Cost {
+            fuel: fuel_cost,
+            position: possible_pos,
+        });
+    }
+
+    let cost = fuel_costs
+        .iter()
+        .reduce(|min_val, val| {
+            if val.fuel < min_val.fuel {
+                return val;
+            } else {
+                return min_val;
+            }
+        })
+        .unwrap();
+
+    println!("{}", cost.fuel)
+}
+
+pub fn main() {
+    part1()
+}
