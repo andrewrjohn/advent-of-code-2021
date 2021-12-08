@@ -7,7 +7,7 @@ struct Cost {
     position: i32,
 }
 
-fn part1() {
+fn part_1() -> i32 {
     let input: Vec<i32> = input_helper::get_input(7)
         .first()
         .unwrap()
@@ -50,9 +50,20 @@ fn part1() {
         })
         .unwrap();
 
-    println!("{}", cost.fuel)
+    println!("{}", cost.fuel);
+
+    return cost.fuel;
 }
 
 pub fn main() {
-    part1()
+    part_1();
+}
+
+#[cfg(test)]
+
+mod tests {
+    #[test]
+    fn part_1() {
+        assert_eq!(super::part_1(), 345035);
+    }
 }
