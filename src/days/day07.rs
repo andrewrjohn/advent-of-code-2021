@@ -39,20 +39,11 @@ fn part_1() -> i32 {
         });
     }
 
-    let cost = fuel_costs
-        .iter()
-        .reduce(|min_val, val| {
-            if val.fuel < min_val.fuel {
-                return val;
-            } else {
-                return min_val;
-            }
-        })
-        .unwrap();
+    let cost = fuel_costs.iter().map(|cost| cost.fuel).min().unwrap();
 
-    println!("{}", cost.fuel);
+    println!("{:?}", cost);
 
-    return cost.fuel;
+    return cost;
 }
 
 pub fn main() {
