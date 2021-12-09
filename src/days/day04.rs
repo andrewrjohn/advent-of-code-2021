@@ -1,93 +1,135 @@
+use super::input_helper;
+
+#[derive(Debug)]
 struct Board {
     drawn_numbers: Vec<i32>,
-    grid: [[i32; 5]; 5],
+    rows: Vec<Vec<i32>>,
+    cols: Vec<Vec<i32>>,
 }
 
 impl Board {
-    fn add_number(&mut self, number: i32) {
+    fn is_marked(&self, number: &i32) -> bool {
+        return self.drawn_numbers.contains(number);
+    }
+
+    fn check_number(&mut self, number: i32) -> Option<i32> {
         self.drawn_numbers.push(number);
 
         // Check for win
-        let mut columns: [[i32; 5]; 5] = [[0; 5]; 5];
         let mut bingo = false;
 
-        for (i, row) in self.grid.iter().enumerate() {
-            // Horizontal row
-            if let true = row.iter().all(|n| self.drawn_numbers.contains(n)) {
+        for row in &self.rows {
+            if let true = row.iter().all(|n| self.is_marked(n)) {
                 println!("Horizontal Match: {:?}", row);
-
                 bingo = true;
-            }
 
-            for (j, num) in row.iter().enumerate() {
-                columns[j][i] = num.to_owned();
+                break;
             }
         }
 
-        // println!("{:?}", columns);
-        // println!("----");
-        for row in columns {
-            if let true = row.iter().all(|n| self.drawn_numbers.contains(n)) {
-                println!("Vertical Match: {:?}", row);
-                bingo = true
+        for col in &self.cols {
+            if let true = col.iter().all(|n| self.is_marked(n)) {
+                // println!("Vertical Match: {:?}", row);
+                bingo = true;
+
+                break;
             }
         }
 
         if bingo != true {
-            return;
-        }
-        let mut unmarked_rows_sum = 0;
-        let mut unmarked_cols_sum = 0;
-
-        for row in self.grid {
-            unmarked_rows_sum += row
-                .iter()
-                .filter(|n| self.drawn_numbers.contains(n) == false)
-                .sum::<i32>();
+            return None;
         }
 
-        for col in columns {
-            unmarked_cols_sum += col
-                .iter()
-                .filter(|n| self.drawn_numbers.contains(n) == false)
-                .sum::<i32>();
-        }
+        let unmarked_rows: i32 = self
+            .rows
+            .iter()
+            .flatten()
+            .filter(|n| !self.is_marked(n))
+            .sum();
 
-        let answer = (unmarked_cols_sum + unmarked_rows_sum) * number;
+        let unmarked_cols: i32 = self
+            .cols
+            .iter()
+            .flatten()
+            .filter(|n| !self.is_marked(n))
+            .sum();
 
-        println!("Answer: {}", answer)
+        let answer = (unmarked_rows + unmarked_cols) * number;
+
+        return Some(answer / 2);
     }
 
-    fn new(grid: [[i32; 5]; 5]) -> Self {
+    fn new(rows: Vec<Vec<i32>>) -> Self {
+        let mut cols = vec![vec![0; 5]; 5];
+
+        for (i, row) in rows.iter().enumerate() {
+            for j in 0..5 {
+                cols[j][i] = row[j];
+            }
+        }
+
         Board {
             drawn_numbers: vec![],
-            grid,
+            rows,
+            cols,
         }
     }
 }
 
 fn part_1() {
-    let mut board = Board::new([
-        [1, 2, 3, 4, 5],
-        [6, 7, 8, 9, 1],
-        [2, 3, 4, 5, 6],
-        [7, 8, 9, 1, 2],
-        [3, 4, 5, 6, 7],
-    ]);
+    let input = input_helper::get_input(4);
 
-    // Horizontal match
-    // board.add_number(1);
-    // board.add_number(2);
-    // board.add_number(3);
-    // board.add_number(4);
-    // board.add_number(5);
+    let numbers: Vec<i32> = input
+        .first()
+        .unwrap()
+        .split(",")
+        .map(|n| n.parse().unwrap())
+        .collect();
 
-    // Vertical match
-    board.add_number(1);
-    board.add_number(6);
-    board.add_number(2);
-    board.add_number(7);
-    board.add_number(3);
+    let board_rows: Vec<String> = input[2..]
+        .to_vec()
+        .iter()
+        .filter_map(|row| {
+            if row != "" {
+                Some(row.to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    let mut boards = Vec::new();
+
+    for board in board_rows.windows(5).step_by(5) {
+        let mut rows: Vec<Vec<i32>> = Vec::new();
+
+        for row in board {
+            let split_row: Vec<i32> = row
+                .trim()
+                .replace("  ", " ")
+                .split(" ")
+                .map(|n| n.parse().unwrap())
+                .collect();
+
+            rows.push(split_row);
+        }
+
+        boards.push(Board::new(rows));
+    }
+
+    let mut answer = 0;
+
+    'outer: for number in numbers {
+        for board in boards.iter_mut() {
+            if let Some(ans) = board.check_number(number) {
+                answer = ans;
+
+                break 'outer;
+            }
+        }
+    }
+
+    println!("Part 1: {:?}", answer);
 }
 
 pub fn main() {
